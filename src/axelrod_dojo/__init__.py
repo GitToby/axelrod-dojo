@@ -1,6 +1,7 @@
 from .version import __version__
 from .archetypes.fsm import FSMParams
 from .archetypes.gambler import GamblerParams
+from .archetypes.cycler import CyclerParams
 from .algorithms.genetic_algorithm import Population
 from .utils import (prepare_objective,
                     load_params,
