@@ -70,7 +70,7 @@ class CyclerParams(Params):
         super().receive_vector(vector)
 
     def __repr__(self):
-        return "{}:{}".format(self.sequence,self.mutation_probability)
+        return "{}".format(self.sequence)
 
     def mutate(self):
         # we treat the mutation probability uniquely for the entire sequence, and we will only mutate a single gene

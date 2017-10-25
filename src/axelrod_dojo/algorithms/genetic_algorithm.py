@@ -1,3 +1,4 @@
+import platform
 from itertools import repeat
 from multiprocessing import Pool, cpu_count
 from operator import itemgetter
@@ -5,12 +6,13 @@ from random import randrange
 from statistics import mean, pstdev
 
 import axelrod as axl
-
+import itertools
 from axelrod_dojo.utils import Outputer, PlayerInfo, score_params
 
 
 class Population(object):
     """Population class that implements the evolutionary algorithm."""
+
     def __init__(self, params_class, params_kwargs, size, objective, output_filename,
                  bottleneck=None, mutation_probability=.1, opponents=None,
                  processes=1, weights=None,
@@ -30,10 +32,10 @@ class Population(object):
             self.bottleneck = bottleneck
         if opponents is None:
             self.opponents_information = [
-                    PlayerInfo(s, {}) for s in axl.short_run_time_strategies]
+                PlayerInfo(s, {}) for s in axl.short_run_time_strategies]
         else:
             self.opponents_information = [
-                    PlayerInfo(p.__class__, p.init_kwargs) for p in opponents]
+                PlayerInfo(p.__class__, p.init_kwargs) for p in opponents]
         self.generation = 0
 
         self.params_kwargs = params_kwargs
@@ -50,13 +52,17 @@ class Population(object):
         self.sample_count = sample_count
 
     def score_all(self):
-        starmap_params = zip(
+        starmap_params_zip = zip(
             self.population,
             repeat(self.objective),
             repeat(self.opponents_information),
             repeat(self.weights),
             repeat(self.sample_count))
-        results = self.pool.starmap(score_params, starmap_params)
+        # ToDo: solve the freeze support problem to allow multi threading (this will also let you debug on windows)
+        if platform.system() == "Windows":
+            results = list(itertools.starmap(score_params, starmap_params_zip))
+        else:
+            results = self.pool.starmap(score_params, starmap_params_zip)
         return results
 
     def subset_population(self, indices):
