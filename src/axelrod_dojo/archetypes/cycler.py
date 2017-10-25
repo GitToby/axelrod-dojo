@@ -1,6 +1,7 @@
 import axelrod as axl
-from axelrod_dojo.utils import Params
 from numpy import random
+
+from axelrod_dojo.utils import Params
 
 C, D = axl.Action
 
@@ -10,18 +11,22 @@ class CyclerParams(Params):
     This cycler params class processes the best sequence of moves to beat a single any single opponent
     """
 
-    def __init__(self, set_seq=None, seq_length: int = 200, mutation_probability=0.1):
+    def __init__(self, sequence=None, sequence_length: int = 200, mutation_probability=0.1):
 
-        if set_seq is None:
+        if sequence is None:
             # generates sequence uses a map to the Action class to change a sequence of 1 & 0s to C & D actions
-            self.sequence = list(map(axl.Action, random.randint(0, 1 + 1, (seq_length, 1))))
-            self.sequence_length = seq_length
+            self.sequence = self.generate_random_sequence(sequence_length)
+            self.sequence_length = sequence_length
         else:
             #  when passing a sequence, make a copy of the sequence to ensure mutation is for the instance only.
-            self.sequence = list(set_seq)
-            self.sequence_length = len(set_seq)
+            self.sequence = list(sequence)
+            self.sequence_length = len(sequence)
 
         self.mutation_probability = mutation_probability
+
+    @staticmethod
+    def generate_random_sequence(seq_length):
+        return list(map(axl.Action, random.randint(0, 1 + 1, (seq_length, 1))))
 
     def vector_to_instance(self):
         super().vector_to_instance()
@@ -46,7 +51,8 @@ class CyclerParams(Params):
         seq_p1 = self.get_sequence()[0: crossover_point]
         # get half 2
         seq_p2 = other_cycler.get_sequence()[crossover_point: other_cycler.get_sequence_length()]
-        return CyclerParams(set_seq=seq_p1 + seq_p2)
+        crossed_sequence = seq_p1 + seq_p2
+        return CyclerParams(sequence=crossed_sequence)
 
     def from_repr(self):
         super().from_repr()
@@ -58,13 +64,13 @@ class CyclerParams(Params):
         super().params()
 
     def player(self):
-        return axl.Cycler(self.get_sequence())
+        return axl.Cycler(self.get_sequence_str())
 
     def receive_vector(self, vector):
         super().receive_vector(vector)
 
     def __repr__(self):
-        super().__repr__()
+        return "{}:{}".format(self.sequence,self.mutation_probability)
 
     def mutate(self):
         # we treat the mutation probability uniquely for the entire sequence, and we will only mutate a single gene
@@ -86,7 +92,7 @@ class CyclerParams(Params):
 
     def copy(self):
         # seq length will be provided when copying
-        return CyclerParams(set_seq=self.get_sequence(), mutation_probability=self.get_mutation_probability())
+        return CyclerParams(sequence=self.get_sequence(), mutation_probability=self.get_mutation_probability())
 
     def get_sequence(self):
         return self.sequence
@@ -96,3 +102,11 @@ class CyclerParams(Params):
 
     def get_mutation_probability(self):
         return self.mutation_probability
+
+    def get_sequence_str(self):
+        string_sequence = ""
+        for action in self.sequence:
+            # concatenate all the actions as strings for construction
+            string_sequence += str(action)
+
+        return string_sequence
