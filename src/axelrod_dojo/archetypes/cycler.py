@@ -8,7 +8,14 @@ C, D = axl.Action
 
 class CyclerParams(Params):
     """
-    This cycler params class processes the best sequence of moves to beat a single any single opponent
+    Cycler params is a class to aid with the processes of calculating the best sequence of moves for any given set of
+    opponents. Each of the population in our algoruthem will be an instance of this class for putting into our
+    genetic lifecycle.
+
+    **********
+    TODOs:
+        * create a metaheuristic for mutations to increase mutation & crossover efficiency (ie, dont change the same
+        gene 2 times in a row or try and do a crossover if the genes being swapped are sufficiently different)
     """
 
     def __init__(self, sequence=None, sequence_length: int = 200, mutation_probability=0.1):
@@ -24,12 +31,23 @@ class CyclerParams(Params):
 
         self.mutation_probability = mutation_probability
 
-    @staticmethod
-    def generate_random_sequence(seq_length):
-        return list(map(axl.Action, random.randint(0, 1 + 1, (seq_length, 1))))
+    def __repr__(self):
+        return "{}".format(self.sequence)
 
-    def vector_to_instance(self):
-        super().vector_to_instance()
+    @staticmethod
+    def generate_random_sequence(sequence_length):
+        """
+        Generates a sequence of random moves when an instance is initialised
+
+        Parameters
+        ----------
+        sequence_length - length or random moves to generate
+
+        Returns
+        -------
+        list - a list of C & D actions: e.g. [C,C,D,D,C]
+        """
+        return list(map(axl.Action, random.randint(0, 1 + 1, (sequence_length, 1))))
 
     def crossover(self, other_cycler):
         """
@@ -54,30 +72,14 @@ class CyclerParams(Params):
         crossed_sequence = seq_p1 + seq_p2
         return CyclerParams(sequence=crossed_sequence)
 
-    def from_repr(self):
-        super().from_repr()
-
-    def create_vector_bounds(self):
-        super().create_vector_bounds()
-
-    def params(self):
-        super().params()
-
-    def player(self):
-        return axl.Cycler(self.get_sequence_str())
-
-    def receive_vector(self, vector):
-        super().receive_vector(vector)
-
-    def __repr__(self):
-        return "{}".format(self.sequence)
-
     def mutate(self):
-        # we treat the mutation probability uniquely for the entire sequence, and we will only mutate a single gene
+        """
+        Basic mutation which changes a single gene in the sequence.
+        """
         # if the mutation occurs
         if random.rand() <= self.mutation_probability:
             mutated_sequence = self.get_sequence()
-            # no +1 as the len() will get the index of the last item
+            # no +1 as the len() will get the index of the last sequence item
             index_to_change = random.randint(0, len(mutated_sequence))
 
             # Mutation - change a single gene
@@ -87,13 +89,46 @@ class CyclerParams(Params):
                 mutated_sequence[index_to_change] = C
             self.sequence = mutated_sequence
 
-    def random(self):
-        super().random()
+    def player(self):
+        """
+        Create and return a Cycler player with the sequence that has been generated with this run.
+
+        Returns
+        -------
+        Cycler(sequence)
+        """
+        return axl.Cycler(self.get_sequence_str())
 
     def copy(self):
+        """
+        Returns a copy of the current cyclerParams
+
+        Returns
+        -------
+        CyclerParams - a separate instance copy of itself.
+        """
         # seq length will be provided when copying
         return CyclerParams(sequence=self.get_sequence(), mutation_probability=self.get_mutation_probability())
 
+    def get_sequence_str(self):
+        """
+        Concatenate all the actions as a string for constructing Cycler players
+
+        [C,D,D,C,D,C] -> "CDDCDC"
+        [C,C,D,C,C,C] -> "CCDCCC"
+        [D,D,D,D,D,D] -> "DDDDDD"
+
+        Returns
+        -------
+        str
+        """
+        string_sequence = ""
+        for action in self.sequence:
+            string_sequence += str(action)
+
+        return string_sequence
+
+    # Getters --------------------
     def get_sequence(self):
         return self.sequence
 
@@ -102,11 +137,3 @@ class CyclerParams(Params):
 
     def get_mutation_probability(self):
         return self.mutation_probability
-
-    def get_sequence_str(self):
-        string_sequence = ""
-        for action in self.sequence:
-            # concatenate all the actions as strings for construction
-            string_sequence += str(action)
-
-        return string_sequence
