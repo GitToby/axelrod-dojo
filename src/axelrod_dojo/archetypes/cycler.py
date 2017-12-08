@@ -18,7 +18,7 @@ class CyclerParams(Params):
         gene 2 times in a row or try and do a crossover if the genes being swapped are sufficiently different)
     """
 
-    def __init__(self, sequence=None, sequence_length: int = 200, mutation_probability=0.1):
+    def __init__(self, sequence=None, sequence_length: int = 200, mutation_probability=0.1, mutation_potency=1):
 
         if sequence is None:
             # generates sequence uses a map to the Action class to change a sequence of 1 & 0s to C & D actions
@@ -30,6 +30,7 @@ class CyclerParams(Params):
             self.sequence_length = len(sequence)
 
         self.mutation_probability = mutation_probability
+        self.mutation_potency = mutation_potency
 
     def __repr__(self):
         return "{}".format(self.sequence)
@@ -63,30 +64,38 @@ class CyclerParams(Params):
         CyclerParams
 
         """
-        # boring single point crossover:
-        crossover_point = int(self.get_sequence_length() // 2)
-        # get half 1
-        seq_p1 = self.get_sequence()[0: crossover_point]
-        # get half 2
-        seq_p2 = other_cycler.get_sequence()[crossover_point: other_cycler.get_sequence_length()]
-        crossed_sequence = seq_p1 + seq_p2
-        return CyclerParams(sequence=crossed_sequence)
+        # 10 crossover points:
+        step_size = int(len(self.get_sequence()) / 10)
+        # empty starting point
+        new_seq = []
+        seq1 = self.get_sequence()
+        seq2 = other_cycler.get_sequence()
+
+        i = 0
+        j = i + step_size
+
+        while j <= len(seq1) - step_size:
+            new_seq = new_seq + seq1[i:j]
+            new_seq = new_seq + seq2[i + step_size:j + step_size]
+            i += 2 * +step_size
+            j += 2 * +step_size
+
+        return CyclerParams(sequence=new_seq)
 
     def mutate(self):
         """
-        Basic mutation which changes a single gene in the sequence.
+        Basic mutation which may change any random gene(s) in the sequence.
         """
         # if the mutation occurs
         if random.rand() <= self.mutation_probability:
             mutated_sequence = self.get_sequence()
-            # no +1 as the len() will get the index of the last sequence item
-            index_to_change = random.randint(0, len(mutated_sequence))
-
-            # Mutation - change a single gene
-            if mutated_sequence[index_to_change] == C:
-                mutated_sequence[index_to_change] = D
-            else:
-                mutated_sequence[index_to_change] = C
+            for _ in range(self.mutation_potency):
+                index_to_change = random.randint(0, len(mutated_sequence))
+                # Mutation - change a single gene
+                if mutated_sequence[index_to_change] == C:
+                    mutated_sequence[index_to_change] = D
+                else:
+                    mutated_sequence[index_to_change] = C
             self.sequence = mutated_sequence
 
     def player(self):

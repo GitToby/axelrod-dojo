@@ -51,9 +51,26 @@ The crossover and mutation are implemented in the following way:
 - Crossover: this is done by taking a randomly selected number of target
   state/actions
   pairs from one individual and the rest from the other.
-- Mutation: given a mutation probability :math:`delta` each target state/action
+- Mutation: given a mutation probability :math:`\delta` each target state/action
   has a probability :math:`\delta` of being randomly changed to one of the other
   states or actions. Furthermore the **initial** action has a probability of
   being swapped of :math:`\delta\times 10^{-1}` and the **initial** state has a
   probability of being changed to another random state of :math:`\delta \times
   10^{-1} \times N` (where :math:`N` is the number of states).
+
+Cycler Sequence Calculator
+--------------------------
+
+A Cycler Sequence is the sequence of C & D actions that are passed to the cycler player to follow when playing their
+tournament games.
+
+the sequence is found using genetic feature selection:
+
+- Crossover: By working with another cycler player, we take sections of each player and create a new cycler sequence
+from the following formula:
+    let our two player being crossed be called p1 and p2 respectively. we then find the midpoint of both the sequences
+     and take the first half from p1 and the second half from p2 to combine into the new cycler sequence.
+
+- Mutation: we use a predictor :math:`\delta`to determine if we are going to mutate a
+single element in the current sequence. The element, or gene, we change in the sequence is uniformly selected using
+the random :code:`package`.

@@ -1,4 +1,5 @@
-import platform
+import itertools
+import os
 from itertools import repeat
 from multiprocessing import Pool, cpu_count
 from operator import itemgetter
@@ -6,7 +7,6 @@ from random import randrange
 from statistics import mean, pstdev
 
 import axelrod as axl
-import itertools
 from axelrod_dojo.utils import Outputer, PlayerInfo, score_params
 
 
@@ -16,13 +16,19 @@ class Population(object):
     def __init__(self, params_class, params_kwargs, size, objective, output_filename,
                  bottleneck=None, mutation_probability=.1, opponents=None,
                  processes=1, weights=None,
-                 sample_count=None, population=None):
+                 sample_count=None, population=None, print_output=True):
+        self.on_windows = os.name == "nt"
         self.params_class = params_class
         self.bottleneck = bottleneck
-
+        self.print_output = print_output
         if processes == 0:
-            processes = cpu_count()
-        self.pool = Pool(processes=processes)
+            self.processes = cpu_count()
+        else:
+            self.processes = processes
+
+        if not self.on_windows:
+            self.pool = Pool(processes=self.processes)
+
         self.outputer = Outputer(output_filename, mode='a')
         self.size = size
         self.objective = objective
@@ -58,8 +64,9 @@ class Population(object):
             repeat(self.opponents_information),
             repeat(self.weights),
             repeat(self.sample_count))
-        # ToDo: solve the freeze support problem to allow multi threading (this will also let you debug on windows)
-        if platform.system() == "Windows":
+        # ToDo: solve the freeze support problem package wide to allow multi threading
+        if self.on_windows:
+            # pool starmapping wont work on windows so we just do it differently
             results = list(itertools.starmap(score_params, starmap_params_zip))
         else:
             results = self.pool.starmap(score_params, starmap_params_zip)
@@ -83,7 +90,8 @@ class Population(object):
 
     def evolve(self):
         self.generation += 1
-        print("Scoring Generation {}".format(self.generation))
+        if self.print_output:
+            print("Scoring Generation {}".format(self.generation))
 
         # Score population
         scores = self.score_all()
@@ -91,14 +99,15 @@ class Population(object):
         results.sort(key=itemgetter(0), reverse=True)
 
         # Report
-        print("Generation", self.generation, "| Best Score:", results[0][0],
-              repr(self.population[results[0][1]]))
+        if self.print_output:
+            print("Generation", self.generation, "| Best Score:", results[0][0], repr(self.population[results[0][
+                1]]))  # prints best result
         # Write the data
         row = [self.generation, mean(scores), pstdev(scores), results[0][0],
                repr(self.population[results[0][1]])]
         self.outputer.write(row)
 
-        ## Next Population
+        # Next Population
         indices_to_keep = [p for (s, p) in results[0: self.bottleneck]]
         self.subset_population(indices_to_keep)
         # Add mutants of the best players
@@ -112,6 +121,7 @@ class Population(object):
         params_to_modify = [params.copy() for params in self.population]
         params_to_modify += random_params
         # Crossover
+        # size_left = self.size - len(self.population)
         size_left = self.size - len(params_to_modify)
         params_to_modify = self.crossover(params_to_modify, size_left)
         # Mutate

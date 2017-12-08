@@ -3,7 +3,6 @@ import tempfile
 import unittest
 
 import axelrod as axl
-
 import axelrod_dojo as axl_dojo
 
 
@@ -17,7 +16,7 @@ class TestCyclerParams(unittest.TestCase):
         cycler_objective = axl_dojo.prepare_objective(name="score", turns=10, repetitions=1)
 
         # Lets use an opponent_list of just one:
-        opponent_list = [axl.TitForTat()]
+        opponent_list = [axl.TitForTat(), axl.Calculator()]
         cycler = axl_dojo.CyclerParams
 
         # params to pass through
@@ -44,3 +43,6 @@ class TestCyclerParams(unittest.TestCase):
 
         # close the temp file
         temp_file.close()
+
+
+        # TODO: add seeded test for file content

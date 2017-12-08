@@ -13,8 +13,11 @@ class TestCyclerParams(unittest.TestCase):
     # Basic creation methods setting the correct params
 
     def test_creation_seqLen(self):
+        # TODO: create a particular creation separate to length
+        axl.seed(0)
         test_length = 10
         self.instance = CyclerParams(sequence_length=test_length)
+        self.assertEqual(self.instance.get_sequence(), [D, C, C, D, C, C, C, C, C, C])
         self.assertEqual(self.instance.get_sequence_length(), test_length)
         self.assertEqual(len(self.instance.get_sequence()), test_length)
 
