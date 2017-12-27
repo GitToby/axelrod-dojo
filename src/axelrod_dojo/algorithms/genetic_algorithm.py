@@ -121,8 +121,8 @@ class Population(object):
         params_to_modify = [params.copy() for params in self.population]
         params_to_modify += random_params
         # Crossover
-        # size_left = self.size - len(self.population)
-        size_left = self.size - len(params_to_modify)
+        size_left = self.size - len(self.population)
+        # size_left = self.size - len(params_to_modify)
         params_to_modify = self.crossover(params_to_modify, size_left)
         # Mutate
         for p in params_to_modify:
