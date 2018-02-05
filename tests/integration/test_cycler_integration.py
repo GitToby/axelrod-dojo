@@ -45,4 +45,26 @@ class TestCyclerParams(unittest.TestCase):
         temp_file.close()
 
 
-        # TODO: add seeded test for file content
+class test_seeding_function(unittest.TestCase):
+    def test_random_player(self):
+        # Get seeded players
+        seeded_class_one = axl_dojo.utils.get_seeded_opponent_instance(axl.Random)
+        seeded_class_two = axl_dojo.utils.get_seeded_opponent_instance(axl.Random)
+
+        # Create matches with seeded instances
+        match_one = axl.Match((axl.TitForTat(), seeded_class_one(),), 20)
+        match_two = axl.Match((axl.TitForTat(), seeded_class_two(),), 20)
+
+        # Ensure both seeded classes play the same
+        self.assertEqual(match_two.play(), match_one.play())
+
+    def test_ZD_player(self):
+        # Create a seeded player
+        seeded_player_one = axl_dojo.utils.get_seeded_opponent_instance(axl.ZDExtort3)()
+
+        # Play this player against two opponents
+        match_one = axl.Match((axl.CollectiveStrategy(), seeded_player_one,), 20)
+        match_two = axl.Match((axl.CollectiveStrategy(), seeded_player_one,), 20)
+
+        # Assert it plays the same across matches.
+        self.assertEqual(match_two.play(), match_one.play())

@@ -105,11 +105,13 @@ def objective_moran_win(me, other, turns, noise, repetitions, N=5,
             scores_for_this_opponent.append(0)
     return scores_for_this_opponent
 
+
 # Evolutionary Algorithm
 
 
 class Params(object):
     """Abstract Base Class for Parameters Objects."""
+
     def mutate(self):
         pass
 
@@ -146,6 +148,7 @@ class Params(object):
     def create_vector_bounds(self):
         """Creates the bounds for the decision variables."""
         pass
+
 
 PlayerInfo = namedtuple('PlayerInfo', ['strategy', 'init_kwargs'])
 
@@ -194,3 +197,12 @@ def load_params(params_class, filename, num):
         best_params.append(parser(rep))
     return best_params
 
+
+def get_seeded_opponent_instance(player_class):
+    class NewClass(player_class):
+        def __init__(self, seed=0):
+            my_seed = seed  # for picklin
+            axl.seed(my_seed)
+            super().__init__()
+
+    return NewClass
