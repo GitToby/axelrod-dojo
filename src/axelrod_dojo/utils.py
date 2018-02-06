@@ -196,13 +196,3 @@ def load_params(params_class, filename, num):
     for score, rep in all_params[:num]:
         best_params.append(parser(rep))
     return best_params
-
-
-def get_seeded_opponent_instance(player_class):
-    class NewClass(player_class):
-        def __init__(self, seed=0):
-            my_seed = seed  # for picklin
-            axl.seed(my_seed)
-            super().__init__()
-
-    return NewClass

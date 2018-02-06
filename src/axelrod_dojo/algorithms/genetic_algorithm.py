@@ -17,7 +17,6 @@ class Population(object):
                  bottleneck=None, mutation_probability=.1, opponents=None,
                  processes=1, weights=None,
                  sample_count=None, population=None, print_output=True):
-        self.on_windows = os.name == "nt"
         self.params_class = params_class
         self.bottleneck = bottleneck
         self.print_output = print_output
@@ -26,8 +25,7 @@ class Population(object):
         else:
             self.processes = processes
 
-        if not self.on_windows:
-            self.pool = Pool(processes=self.processes)
+        self.pool = Pool(processes=self.processes)
 
         self.outputer = Outputer(output_filename, mode='a')
         self.size = size
@@ -64,12 +62,7 @@ class Population(object):
             repeat(self.opponents_information),
             repeat(self.weights),
             repeat(self.sample_count))
-        # ToDo: solve the freeze support problem package wide to allow multi threading
-        if self.on_windows:
-            # pool starmapping wont work on windows so we just do it differently
-            results = list(itertools.starmap(score_params, starmap_params_zip))
-        else:
-            results = self.pool.starmap(score_params, starmap_params_zip)
+        results = self.pool.starmap(score_params, starmap_params_zip)
         return results
 
     def subset_population(self, indices):
@@ -135,6 +128,7 @@ class Population(object):
         self.evolve()
 
     def run(self, generations):
+        print(self.processes)
         for _ in range(generations):
             next(self)
         self.outputer.close()
