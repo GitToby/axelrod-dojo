@@ -4,8 +4,6 @@ import unittest
 import axelrod as axl
 import axelrod_dojo as axl_dojo
 
-POPULATION_SIZE = 20
-
 
 class TestPopulationSizes(unittest.TestCase):
 
@@ -21,19 +19,20 @@ class TestPopulationSizes(unittest.TestCase):
             "sequence_length": 10
         }
 
+        population_size = 20
         population = axl_dojo.Population(params_class=axl_dojo.CyclerParams,
                                          params_kwargs=cycler_kwargs,
-                                         size=POPULATION_SIZE,
+                                         size=population_size,
                                          objective=cycler_objective,
                                          output_filename=temp_file.name,
                                          opponents=opponent_list)
 
         # Before run
-        self.assertEqual(len(population.population), POPULATION_SIZE)
+        self.assertEqual(len(population.population), population_size)
 
         # After Run
         population.run(generations=5)
-        self.assertEqual(len(population.population), POPULATION_SIZE)
+        self.assertEqual(len(population.population), population_size)
 
         # close the temp file
         temp_file.close()
@@ -50,20 +49,21 @@ class TestPopulationSizes(unittest.TestCase):
             "sequence_length": 10
         }
 
+        population_size = 20
         population = axl_dojo.Population(params_class=axl_dojo.CyclerParams,
                                          params_kwargs=cycler_kwargs,
-                                         size=POPULATION_SIZE,
+                                         size=population_size,
                                          bottleneck=1,
                                          objective=cycler_objective,
                                          output_filename=temp_file.name,
                                          opponents=opponent_list)
 
         # Before run
-        self.assertEqual(len(population.population), POPULATION_SIZE)
+        self.assertEqual(len(population.population), population_size)
 
         # After Run
         population.run(generations=5)
-        self.assertEqual(len(population.population), POPULATION_SIZE)
+        self.assertEqual(len(population.population), population_size)
 
         # close the temp file
         temp_file.close()
