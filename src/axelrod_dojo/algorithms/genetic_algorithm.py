@@ -62,7 +62,10 @@ class Population(object):
             repeat(self.opponents_information),
             repeat(self.weights),
             repeat(self.sample_count))
-        results = self.pool.starmap(score_params, starmap_params_zip)
+        if self.processes == 1:
+            results = list(itertools.starmap(score_params, starmap_params_zip))
+        else:
+            results = self.pool.starmap(score_params, starmap_params_zip)
         return results
 
     def subset_population(self, indices):
@@ -128,7 +131,6 @@ class Population(object):
         self.evolve()
 
     def run(self, generations):
-        print(self.processes)
         for _ in range(generations):
             next(self)
         self.outputer.close()
