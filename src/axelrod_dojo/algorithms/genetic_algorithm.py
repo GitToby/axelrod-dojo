@@ -101,7 +101,7 @@ class Population(object):
         # Write the data
         row = [self.generation, mean(scores), pstdev(scores), results[0][0],
                repr(self.population[results[0][1]])]
-        self.outputer.write(row)
+        self.outputer.write_row(row)
 
         # Next Population
         indices_to_keep = [p for (s, p) in results[0: self.bottleneck]]
@@ -133,4 +133,3 @@ class Population(object):
     def run(self, generations):
         for _ in range(generations):
             next(self)
-        self.outputer.close()

@@ -9,18 +9,24 @@ import axelrod_dojo.utils as utils
 
 
 class TestOutputer(unittest.TestCase):
-    temporary_file = tempfile.NamedTemporaryFile()
-    outputer = utils.Outputer(filename=temporary_file.name)
+    temporary_file = tempfile.NamedTemporaryFile(delete=False)
+    outputer = utils.Outputer(filename=temporary_file.name, mode='a')
 
     def test_init(self):
-        self.assertIsInstance(self.outputer.output, io.TextIOWrapper)
-        self.assertEqual(str(type(self.outputer.writer)),
-                        "<class '_csv.writer'>")
+        self.assertEqual(self.outputer.file, self.temporary_file.name)
+        self.assertEqual(self.outputer.mode, 'a')
 
-    def test_write(self):
-        self.assertIsNone(self.outputer.write([1, 2, 3]))
+    def test_write_and_clear(self):
+        writing_line = [1, "something", 3.0]
+        self.outputer.write_row(writing_line)
+        self.outputer.write_row(writing_line)
         with open(self.temporary_file.name, "r") as f:
-            self.assertEqual("1,2,3\n", f.read())
+            self.assertEqual("1,something,3.0\n1,something,3.0\n", f.read())
+
+        self.outputer.clear_file()
+        with open(self.temporary_file.name, "r") as f:
+            self.assertEqual("", f.read())
+
 
 
 class TestPrepareObjective(unittest.TestCase):

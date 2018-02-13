@@ -2,7 +2,6 @@ from collections import namedtuple
 from functools import partial
 from statistics import mean
 import csv
-import os
 
 import numpy as np
 import axelrod as axl
@@ -11,17 +10,20 @@ import axelrod as axl
 ## Output Evolutionary Algorithm results
 
 class Outputer(object):
-    def __init__(self, filename, mode='w'):
-        self.output = open(filename, mode)
-        self.writer = csv.writer(self.output)
+    def __init__(self, filename, mode='a'):
+        self.file = filename
+        self.mode = mode
 
-    def write(self, row):
-        self.writer.writerow(row)
-        self.output.flush()
-        os.fsync(self.output.fileno())
+    def write_row(self, row):
+        with open(self.file, self.mode, newline='') as file_writer:
+            writer = csv.writer(file_writer)
+            writer.writerow(row)
 
-    def close(self):
-        self.output.close()
+    def clear_file(self):
+        with open(self.file, 'w+', newline='') as file_writer:
+            # Passing will open and clear the file then close it all in one.
+            pass
+
 
 
 ## Objective functions for optimization
