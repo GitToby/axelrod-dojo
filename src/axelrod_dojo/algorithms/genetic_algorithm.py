@@ -131,5 +131,8 @@ class Population(object):
         self.evolve()
 
     def run(self, generations):
+        row = ["generation", "mean_over_pop", "srt_var", "best_score",
+               "best_sequence"]
+        self.outputer.write_row(row)
         for _ in range(generations):
             next(self)
