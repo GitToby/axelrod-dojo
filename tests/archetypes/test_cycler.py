@@ -34,25 +34,27 @@ class TestCyclerParams(unittest.TestCase):
     #     test_seq = [C, C, D, C, C, D, D, C, D, D]
     #     self.assertRaises(ValueError, CyclerParams(set_seq=test_seq, seq_length=test_length))
 
-    def test_crossover_1(self):
-        test_seq_1 = [C, D, D, C, C, D, D, C]
-        test_seq_2 = [C, D, C, C, D, D, C, D]
-        result_seq = [C, D, D, C, D, D, C, D]
+    def test_crossover_even_length(self):
+        # Even test
+        test_seq_1 = [C] * 6
+        test_seq_2 = [D] * 6
+        result_seq = [C, C, C, D, D, D]
 
         self.instance = CyclerParams(sequence=test_seq_1)
         instance_two = CyclerParams(sequence=test_seq_2)
         out_cycler = self.instance.crossover(instance_two)
-        self.assertEqual(out_cycler.get_sequence(), result_seq)
+        self.assertEqual(result_seq, out_cycler.get_sequence())
 
-    def test_crossover_2(self):
-        test_seq_1 = [C, D, D, C, C, D, D]
-        test_seq_2 = [C, D, C, C, D, D, C]
-        result_seq = [C, D, D, C, D, D, C]
+    def test_crossover_odd_length(self):
+        # Odd Test
+        test_seq_1 = [C] * 7
+        test_seq_2 = [D] * 7
+        result_seq = [C, C, C, C, D, D, D]
 
         self.instance = CyclerParams(sequence=test_seq_1)
         instance_two = CyclerParams(sequence=test_seq_2)
         out_cycler = self.instance.crossover(instance_two)
-        self.assertEqual(out_cycler.get_sequence(), result_seq)
+        self.assertEqual(result_seq, out_cycler.get_sequence())
 
     def test_mutate(self):
         test_seq = [C, D, D, C, C, D, D]

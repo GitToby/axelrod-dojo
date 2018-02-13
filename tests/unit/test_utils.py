@@ -27,8 +27,6 @@ class TestOutputer(unittest.TestCase):
         with open(self.temporary_file.name, "r") as f:
             self.assertEqual("", f.read())
 
-
-
 class TestPrepareObjective(unittest.TestCase):
     def test_incorrect_objective_name(self):
         name = "not_correct_name"

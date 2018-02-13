@@ -53,9 +53,8 @@ class CyclerParams(Params):
     def crossover(self, other_cycler):
         """
         creates and returns a new CyclerParams instance with a single crossover point in the middle
-        Parameters
 
-        if the length of the sequences is odd, there will be one more element from the self CyclerParams
+        Parameters
         ----------
         other_cycler - the other cycler where we get the other half of the sequence
 
@@ -64,21 +63,16 @@ class CyclerParams(Params):
         CyclerParams
 
         """
-        # 10 crossover points:
-        step_size = int(len(self.get_sequence()) / 10)
-        # empty starting point
-        new_seq = []
         seq1 = self.get_sequence()
         seq2 = other_cycler.get_sequence()
 
-        i = 0
-        j = i + step_size
+        midpoint = int(len(seq1) / 2)
 
-        while j <= len(seq1) - step_size:
-            new_seq = new_seq + seq1[i:j]
-            new_seq = new_seq + seq2[i + step_size:j + step_size]
-            i += 2 * +step_size
-            j += 2 * +step_size
+        # If the length is odd, keep more from sequence 1
+        if len(seq1) % 2 == 1:
+            midpoint += 1
+
+        new_seq = seq1[:midpoint] + seq2[midpoint:]
 
         return CyclerParams(sequence=new_seq)
 
