@@ -1,6 +1,4 @@
-import itertools
-import os
-from itertools import repeat
+from itertools import repeat, starmap
 from multiprocessing import Pool, cpu_count
 from operator import itemgetter
 from random import randrange
@@ -63,7 +61,7 @@ class Population(object):
             repeat(self.weights),
             repeat(self.sample_count))
         if self.processes == 1:
-            results = list(itertools.starmap(score_params, starmap_params_zip))
+            results = list(starmap(score_params, starmap_params_zip))
         else:
             results = self.pool.starmap(score_params, starmap_params_zip)
         return results
