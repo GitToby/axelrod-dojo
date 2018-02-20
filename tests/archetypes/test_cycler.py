@@ -38,22 +38,22 @@ class TestCyclerParams(unittest.TestCase):
         # Even test
         test_seq_1 = [C] * 6
         test_seq_2 = [D] * 6
-        result_seq = [C, C, C, D, D, D]
+        result_seq = [C, C, D, D, D, D]
 
         self.instance = CyclerParams(sequence=test_seq_1)
         instance_two = CyclerParams(sequence=test_seq_2)
-        out_cycler = self.instance.crossover(instance_two)
+        out_cycler = self.instance.crossover(instance_two, in_seed=1)
         self.assertEqual(result_seq, out_cycler.get_sequence())
 
     def test_crossover_odd_length(self):
         # Odd Test
         test_seq_1 = [C] * 7
         test_seq_2 = [D] * 7
-        result_seq = [C, C, C, C, D, D, D]
+        result_seq = [C, C, D, D, D, D, D]
 
         self.instance = CyclerParams(sequence=test_seq_1)
         instance_two = CyclerParams(sequence=test_seq_2)
-        out_cycler = self.instance.crossover(instance_two)
+        out_cycler = self.instance.crossover(instance_two, in_seed=1)
         self.assertEqual(result_seq, out_cycler.get_sequence())
 
     def test_mutate(self):

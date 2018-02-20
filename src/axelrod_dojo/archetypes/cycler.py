@@ -13,7 +13,7 @@ class CyclerParams(Params):
     genetic lifecycle.
 
     **********
-    TODOs:
+    Expansions:
         * create a metaheuristic for mutations to increase mutation & crossover efficiency (ie, dont change the same
         gene 2 times in a row or try and do a crossover if the genes being swapped are sufficiently different)
     """
@@ -21,7 +21,7 @@ class CyclerParams(Params):
     def __init__(self, sequence=None, sequence_length: int = 200, mutation_probability=0.1, mutation_potency=1):
 
         if sequence is None:
-            # generates sequence uses a map to the Action class to change a sequence of 1 & 0s to C & D actions
+            # generates random sequence if none is given
             self.sequence = self.generate_random_sequence(sequence_length)
             self.sequence_length = sequence_length
         else:
@@ -38,19 +38,20 @@ class CyclerParams(Params):
     @staticmethod
     def generate_random_sequence(sequence_length):
         """
-        Generates a sequence of random moves when an instance is initialised
+        Generate a sequence of random moves
 
         Parameters
         ----------
-        sequence_length - length or random moves to generate
+        sequence_length - length of random moves to generate
 
         Returns
         -------
-        list - a list of C & D actions: e.g. [C,C,D,D,C]
+        list - a list of C & D actions: list[Action]
         """
-        return list(map(axl.Action, random.randint(0, 1 + 1, (sequence_length, 1))))
+        # D = axl.Action(0) | C = axl.Action(1)
+        return list(map(axl.Action, random.randint(0, 2, (sequence_length, 1))))
 
-    def crossover(self, other_cycler):
+    def crossover(self, other_cycler, in_seed=0):
         """
         creates and returns a new CyclerParams instance with a single crossover point in the middle
 
@@ -66,14 +67,12 @@ class CyclerParams(Params):
         seq1 = self.get_sequence()
         seq2 = other_cycler.get_sequence()
 
-        midpoint = int(len(seq1) / 2)
+        if not in_seed == 0:
+            # only seed for when we explicitly give it a seed
+            random.seed(in_seed)
 
-        # If the length is odd, keep more from sequence 1
-        if len(seq1) % 2 == 1:
-            midpoint += 1
-
+        midpoint = int(random.randint(0, len(seq1)) / 2)
         new_seq = seq1[:midpoint] + seq2[midpoint:]
-
         return CyclerParams(sequence=new_seq)
 
     def mutate(self):
@@ -85,11 +84,7 @@ class CyclerParams(Params):
             mutated_sequence = self.get_sequence()
             for _ in range(self.mutation_potency):
                 index_to_change = random.randint(0, len(mutated_sequence))
-                # Mutation - change a single gene
-                if mutated_sequence[index_to_change] == C:
-                    mutated_sequence[index_to_change] = D
-                else:
-                    mutated_sequence[index_to_change] = C
+                mutated_sequence[index_to_change] = mutated_sequence[index_to_change].flip()
             self.sequence = mutated_sequence
 
     def player(self):
