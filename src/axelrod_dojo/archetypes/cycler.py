@@ -9,26 +9,19 @@ C, D = axl.Action
 class CyclerParams(Params):
     """
     Cycler params is a class to aid with the processes of calculating the best sequence of moves for any given set of
-    opponents. Each of the population in our algoruthem will be an instance of this class for putting into our
+    opponents. Each of the population in our algorithm will be an instance of this class for putting into our
     genetic lifecycle.
-
-    **********
-    Expansions:
-        * create a metaheuristic for mutations to increase mutation & crossover efficiency (ie, dont change the same
-        gene 2 times in a row or try and do a crossover if the genes being swapped are sufficiently different)
     """
 
     def __init__(self, sequence=None, sequence_length: int = 200, mutation_probability=0.1, mutation_potency=1):
-
         if sequence is None:
             # generates random sequence if none is given
             self.sequence = self.generate_random_sequence(sequence_length)
-            self.sequence_length = sequence_length
         else:
             #  when passing a sequence, make a copy of the sequence to ensure mutation is for the instance only.
             self.sequence = list(sequence)
-            self.sequence_length = len(sequence)
 
+        self.sequence_length = len(self.sequence)
         self.mutation_probability = mutation_probability
         self.mutation_potency = mutation_potency
 
@@ -64,8 +57,8 @@ class CyclerParams(Params):
         CyclerParams
 
         """
-        seq1 = self.get_sequence()
-        seq2 = other_cycler.get_sequence()
+        seq1 = self.sequence
+        seq2 = other_cycler.sequence
 
         if not in_seed == 0:
             # only seed for when we explicitly give it a seed
@@ -79,9 +72,8 @@ class CyclerParams(Params):
         """
         Basic mutation which may change any random gene(s) in the sequence.
         """
-        # if the mutation occurs
         if random.rand() <= self.mutation_probability:
-            mutated_sequence = self.get_sequence()
+            mutated_sequence = self.sequence
             for _ in range(self.mutation_potency):
                 index_to_change = random.randint(0, len(mutated_sequence))
                 mutated_sequence[index_to_change] = mutated_sequence[index_to_change].flip()
@@ -105,8 +97,8 @@ class CyclerParams(Params):
         -------
         CyclerParams - a separate instance copy of itself.
         """
-        # seq length will be provided when copying
-        return CyclerParams(sequence=self.get_sequence(), mutation_probability=self.get_mutation_probability())
+        # seq length will be provided when copying, no need to pass
+        return CyclerParams(sequence=self.sequence, mutation_probability=self.mutation_probability)
 
     def get_sequence_str(self):
         """
@@ -125,13 +117,3 @@ class CyclerParams(Params):
             string_sequence += str(action)
 
         return string_sequence
-
-    # Getters --------------------
-    def get_sequence(self):
-        return self.sequence
-
-    def get_sequence_length(self):
-        return self.sequence_length
-
-    def get_mutation_probability(self):
-        return self.mutation_probability

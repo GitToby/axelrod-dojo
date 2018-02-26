@@ -19,12 +19,6 @@ class Outputer(object):
             writer = csv.writer(file_writer)
             writer.writerow(row)
 
-    def clear_file(self):
-        with open(self.file, 'w+', newline='') as file_writer:
-            # Passing will open and clear the file then close it all in one.
-            pass
-
-
 
 ## Objective functions for optimization
 
