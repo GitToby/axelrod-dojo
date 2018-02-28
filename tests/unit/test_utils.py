@@ -23,9 +23,6 @@ class TestOutputer(unittest.TestCase):
         with open(self.temporary_file.name, "r") as f:
             self.assertEqual("1,something,3.0\n1,something,3.0\n", f.read())
 
-        self.outputer.clear_file()
-        with open(self.temporary_file.name, "r") as f:
-            self.assertEqual("", f.read())
 
 class TestPrepareObjective(unittest.TestCase):
     def test_incorrect_objective_name(self):
@@ -35,11 +32,11 @@ class TestPrepareObjective(unittest.TestCase):
 
     def test_score(self):
         objective = utils.prepare_objective(
-                                    name="score",
-                                    turns=200,
-                                    noise=0,
-                                    match_attributes={"length": float("inf")},
-                                    repetitions=5)
+            name="score",
+            turns=200,
+            noise=0,
+            match_attributes={"length": float("inf")},
+            repetitions=5)
         self.assertIsInstance(objective, functools.partial)
         self.assertIn("objective_score ", str(objective))
 
@@ -185,6 +182,7 @@ class DummyParams(utils.Params):
     """
     Dummy Params class for testing purposes
     """
+
     def player(self):
         return axl.Cooperator()
 
