@@ -76,7 +76,11 @@ class CyclerParams(Params):
             mutated_sequence = self.sequence
             for _ in range(self.mutation_potency):
                 index_to_change = random.randint(0, len(mutated_sequence))
-                mutated_sequence[index_to_change] = mutated_sequence[index_to_change].flip()
+                try:
+                    mutated_sequence[index_to_change] = mutated_sequence[index_to_change].flip()
+                except AttributeError:
+                    mutated_sequence[index_to_change] = axl.Action.from_char(mutated_sequence[index_to_change]).flip()
+
             self.sequence = mutated_sequence
 
     def player(self):

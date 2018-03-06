@@ -2,7 +2,7 @@ from itertools import repeat, starmap
 from multiprocessing import Pool, cpu_count
 from operator import itemgetter
 from random import randrange
-from statistics import mean, pstdev
+from statistics import mean, pstdev, median
 
 import axelrod as axl
 from axelrod_dojo.utils import Outputer, PlayerInfo, score_params
@@ -92,17 +92,45 @@ class Population(object):
         results = list(zip(scores, range(len(scores))))
         results.sort(key=itemgetter(0), reverse=True)
 
+        # Write the data
+        # Note: if using this for analysis, for reproducability it may be useful to alter the data passed back
+
+        for strategy, init_kwargs in self.opponents_information:
+            opponent = strategy(**init_kwargs)
+            opponent_type = type(opponent).name
+            player_seed = None
+            try:
+                player_seed = init_kwargs['seed']
+            except KeyError:
+                pass
+
+        # Row Data Cols:
+        # 0:Generation no.
+        # 1:Mean score over pop
+        # 2:Medan score over pop
+        # 3:Population Variance
+        # 4:Score range
+        # 5:Highest scoring result
+        # 6:sequence of highest scoring result
+        # 7:Opponent type
+
+        # Opponent Sequence can be reconstructed by playing a match against the exact seed params
+
+        row = [self.generation, # 0
+               mean(scores),# 1
+               median(scores),# 2
+               pstdev(scores),# 3
+               results[0][0]-results[len(results)-1][0],# 4
+               results[0][0],# 5
+               repr(self.population[results[0][1]]),# 6
+               opponent_type],# 7
+
+        self.outputer.write_row(row)
+
         # Report
         if self.print_output:
-            print("Generation", self.generation, "| Best Score:", results[0][0], repr(self.population[results[0][
-                1]]))  # prints best result
-        # Write the data
-        # Note: if using this for analysis, for reproducability it may be useful to
-        # pass type(opponent) for each of the opponents. This will allow verification of results post run
-
-        row = [self.generation, mean(scores), pstdev(scores), results[0][0],
-               repr(self.population[results[0][1]])]
-        self.outputer.write_row(row)
+            print()
+            print(row)  # prints best result
 
         # Next Population
         indices_to_keep = [p for (s, p) in results[0: self.bottleneck]]
