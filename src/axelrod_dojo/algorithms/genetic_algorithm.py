@@ -95,10 +95,12 @@ class Population(object):
         # Write the data
         # Note: if using this for analysis, for reproducability it may be useful to alter the data passed back
 
+        opponent_type = 'unknown'
+        player_seed = None
+
         for strategy, init_kwargs in self.opponents_information:
             opponent = strategy(**init_kwargs)
             opponent_type = type(opponent).name
-            player_seed = None
             try:
                 player_seed = init_kwargs['seed']
             except KeyError:
@@ -117,15 +119,15 @@ class Population(object):
 
         # Opponent Sequence can be reconstructed by playing a match against the exact seed params
 
-        row = [self.generation, # 0
-               mean(scores),# 1
-               median(scores),# 2
-               pstdev(scores),# 3
-               results[0][0]-results[len(results)-1][0],# 4
-               results[0][0],# 5
-               repr(self.population[results[0][1]]),# 6
-               opponent_type,
-               player_seed]# 7
+        row = [self.generation,  # 0
+               mean(scores),  # 1
+               median(scores),  # 2
+               pstdev(scores),  # 3
+               results[0][0] - results[len(results) - 1][0],  # 4
+               results[0][0],  # 5
+               repr(self.population[results[0][1]]),  # 6
+               opponent_type,  # 7
+               player_seed]  # 8
 
         self.outputer.write_row(row)
 
