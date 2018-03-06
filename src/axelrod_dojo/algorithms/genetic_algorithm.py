@@ -113,6 +113,7 @@ class Population(object):
         # 5:Highest scoring result
         # 6:sequence of highest scoring result
         # 7:Opponent type
+        # 8:Seed (if applicable, else None)
 
         # Opponent Sequence can be reconstructed by playing a match against the exact seed params
 
@@ -123,7 +124,8 @@ class Population(object):
                results[0][0]-results[len(results)-1][0],# 4
                results[0][0],# 5
                repr(self.population[results[0][1]]),# 6
-               opponent_type],# 7
+               opponent_type,
+               player_seed]# 7
 
         self.outputer.write_row(row)
 
