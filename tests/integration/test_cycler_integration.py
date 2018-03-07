@@ -34,8 +34,8 @@ class TestCyclerParams(unittest.TestCase):
                                          output_filename=temp_file.name,
                                          opponents=opponent_list)
 
-        cycler_generations = 5
-        population.run(cycler_generations)
+        generations = 5
+        population.run(generations, print_output=False)
 
         # assert the output file exists and is not empty
         self.assertTrue(os.path.exists(temp_file.name))

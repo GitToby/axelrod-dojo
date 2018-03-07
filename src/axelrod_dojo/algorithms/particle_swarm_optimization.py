@@ -48,7 +48,7 @@ class PSO(object):
                                   weights=self.weights,
                                   sample_count=self.sample_count,
                                   instance_generation_function=instance_generation_function
-                                 )
+                                  )
 
         # TODO remove check once v 0.7 is pip installable
         # There is a multiprocessing version (0.7) of pyswarm available at

@@ -9,7 +9,7 @@ C, D = axl.Action.C, axl.Action.D
 
 
 class TestHMM(unittest.TestCase):
-    temporary_file = tempfile.NamedTemporaryFile()
+    temporary_file = tempfile.NamedTemporaryFile(mode='w', delete=False)
 
     def test_score(self):
         name = "score"
@@ -37,7 +37,7 @@ class TestHMM(unittest.TestCase):
 
         generations = 4
         axl.seed(0)
-        population.run(generations)
+        population.run(generations, print_output=False)
         self.assertEqual(population.generation, 4)
 
         # Manually read from temp file to find best strategy
@@ -45,7 +45,7 @@ class TestHMM(unittest.TestCase):
         with open(self.temporary_file.name, "r") as f:
             reader = csv.reader(f)
             for row in reader:
-                _, mean_score, sd_score, max_score, arg_max = row
+                _, mean_score, median, sd_score, score_range, max_score, arg_max, op_type, seed = row
                 if float(max_score) > best_score:
                     best_score = float(max_score)
                     best_params = arg_max
@@ -69,11 +69,11 @@ class TestHMM(unittest.TestCase):
                                      opponents=opponents,
                                      population=best,
                                      bottleneck=2,
-                                     mutation_probability = .01,
+                                     mutation_probability=.01,
                                      processes=1)
         generations = 4
         axl.seed(0)
-        population.run(generations)
+        population.run(generations, print_output=False)
         self.assertEqual(population.generation, 4)
 
     def test_score_with_weights(self):
@@ -98,12 +98,12 @@ class TestHMM(unittest.TestCase):
                                      opponents=opponents,
                                      weights=[5, 1, 1, 1, 1],
                                      bottleneck=2,
-                                     mutation_probability = .01,
+                                     mutation_probability=.01,
                                      processes=1)
 
         generations = 4
         axl.seed(0)
-        population.run(generations)
+        population.run(generations, print_output=False)
         self.assertEqual(population.generation, 4)
 
         # Manually read from temp file to find best strategy
@@ -111,7 +111,7 @@ class TestHMM(unittest.TestCase):
         with open(self.temporary_file.name, "r") as f:
             reader = csv.reader(f)
             for row in reader:
-                _, mean_score, sd_score, max_score, arg_max = row
+                _, mean_score, median, sd_score, score_range, max_score, arg_max, op_type, seed = row
                 if float(max_score) > best_score:
                     best_score = float(max_score)
                     best_params = arg_max
@@ -150,12 +150,12 @@ class TestHMM(unittest.TestCase):
                                      opponents=opponents,
                                      sample_count=2,  # Randomly sample 2 opponents at each step
                                      bottleneck=2,
-                                     mutation_probability = .01,
+                                     mutation_probability=.01,
                                      processes=1)
 
         generations = 4
         axl.seed(0)
-        population.run(generations)
+        population.run(generations, print_output=False)
         self.assertEqual(population.generation, 4)
 
         # Manually read from temp file to find best strategy
@@ -163,7 +163,7 @@ class TestHMM(unittest.TestCase):
         with open(self.temporary_file.name, "r") as f:
             reader = csv.reader(f)
             for row in reader:
-                _, mean_score, sd_score, max_score, arg_max = row
+                _, mean_score, median, sd_score, score_range, max_score, arg_max, op_type, seed = row
                 if float(max_score) > best_score:
                     best_score = float(max_score)
                     best_params = arg_max
@@ -203,12 +203,12 @@ class TestHMM(unittest.TestCase):
                                      sample_count=2,  # Randomly sample 2 opponents at each step
                                      weights=[5, 1, 1, 1, 1],
                                      bottleneck=2,
-                                     mutation_probability = .01,
+                                     mutation_probability=.01,
                                      processes=1)
 
         generations = 4
         axl.seed(0)
-        population.run(generations)
+        population.run(generations, print_output=False)
         self.assertEqual(population.generation, 4)
 
         # Manually read from tempo file to find best strategy
@@ -216,7 +216,7 @@ class TestHMM(unittest.TestCase):
         with open(self.temporary_file.name, "r") as f:
             reader = csv.reader(f)
             for row in reader:
-                _, mean_score, sd_score, max_score, arg_max = row
+                _, mean_score, median, sd_score, score_range, max_score, arg_max, op_type, seed = row
                 if float(max_score) > best_score:
                     best_score = float(max_score)
                     best_params = arg_max
@@ -254,12 +254,12 @@ class TestHMM(unittest.TestCase):
                                      output_filename=self.temporary_file.name,
                                      opponents=opponents,
                                      bottleneck=2,
-                                     mutation_probability = .01,
+                                     mutation_probability=.01,
                                      processes=0)
 
         generations = 4
         axl.seed(0)
-        population.run(generations)
+        population.run(generations, print_output=False)
         self.assertEqual(population.generation, 4)
 
     def test_population_init_with_given_rate(self):
@@ -284,14 +284,14 @@ class TestHMM(unittest.TestCase):
                                      output_filename=self.temporary_file.name,
                                      opponents=opponents,
                                      bottleneck=2,
-                                     mutation_probability = .01,
+                                     mutation_probability=.01,
                                      processes=1)
 
         for p in population.population:
             self.assertEqual(p.mutation_probability, .5)
         generations = 1
         axl.seed(0)
-        population.run(generations)
+        population.run(generations, print_output=False)
         self.assertEqual(population.generation, 1)
 
     def test_score_pso(self):
@@ -314,11 +314,12 @@ class TestHMM(unittest.TestCase):
                        objective=objective,
                        opponents=opponents,
                        population=size,
-                       generations=generations)
+                       generations=generations,
+                       debug=False)
 
         axl.seed(0)
         xopt, fopt = pso.swarm()
-        
+
         self.assertTrue(len(xopt) == 2 * num_states ** 2 + num_states + 1)
 
         # You can put the optimal vector back into a HMM.
@@ -326,10 +327,7 @@ class TestHMM(unittest.TestCase):
         simple_hmm_opt.receive_vector(xopt)
         simple_player = simple_hmm_opt.player()
         self.assertTrue(simple_player.hmm.is_well_formed())  # This should get asserted in initialization anyway
-        
         self.assertIsInstance(simple_hmm_opt, dojo.HMMParams)
-        print(xopt)  # As a vector still
-        print(simple_hmm_opt)  # As a HMM
 
     def test_pso_to_ea(self):
         name = "score"
@@ -349,7 +347,6 @@ class TestHMM(unittest.TestCase):
         winners = []
 
         for _ in range(5):
-
             axl.seed(_)
 
             pso = dojo.PSO(dojo.HMMParams,
@@ -357,7 +354,8 @@ class TestHMM(unittest.TestCase):
                            objective=objective,
                            opponents=opponents,
                            population=size,
-                           generations=generations)
+                           generations=generations,
+                           debug=False)
 
             xopt, fopt = pso.swarm()
 
@@ -366,9 +364,9 @@ class TestHMM(unittest.TestCase):
             hmm_opt.receive_vector(xopt)
 
             winners.append(hmm_opt)
-            
+
         # Put the winners of the PSO into an EA.
-                                             
+
         population = dojo.Population(params_class=dojo.HMMParams,
                                      params_kwargs={"num_states": num_states},
                                      size=size,
@@ -377,12 +375,12 @@ class TestHMM(unittest.TestCase):
                                      opponents=opponents,
                                      population=winners,
                                      bottleneck=2,
-                                     mutation_probability = .01,
+                                     mutation_probability=.01,
                                      processes=1)
 
         axl.seed(0)
-        population.run(generations)
-        
+        population.run(generations, print_output=False)
+
         # Block resource (?)
         with open(self.temporary_file.name, "w") as f:
             pass
@@ -394,5 +392,3 @@ class TestHMM(unittest.TestCase):
                 record = s
                 record_holder = i
         xopt, fopt = population.population[record_holder], record
-
-        print(xopt)

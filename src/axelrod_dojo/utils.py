@@ -185,7 +185,9 @@ def load_params(params_class, filename, num):
     with open(filename) as datafile:
         reader = csv.reader(datafile)
         for line in reader:
-            score, rep = float(line[-2]), line[-1]
+            # Note: index locations will change if the write params in the Population class are changed.
+            # Tests WILL fail unless the correct values are selected.
+            score, rep = float(line[5]), line[6]
             all_params.append((score, rep))
     all_params.sort(reverse=True)
     best_params = []

@@ -14,10 +14,10 @@ class Population(object):
     def __init__(self, params_class, params_kwargs, size, objective, output_filename,
                  bottleneck=None, mutation_probability=.1, opponents=None,
                  processes=1, weights=None,
-                 sample_count=None, population=None, print_output=True):
+                 sample_count=None, population=None):
+        self.print_output = True
         self.params_class = params_class
         self.bottleneck = bottleneck
-        self.print_output = print_output
         if processes == 0:
             self.processes = cpu_count()
         else:
@@ -95,46 +95,44 @@ class Population(object):
         # Write the data
         # Note: if using this for analysis, for reproducability it may be useful to alter the data passed back
 
-        opponent_type = 'unknown'
-        player_seed = None
+        opponent_strategy_name = 'unknown'
 
         for strategy, init_kwargs in self.opponents_information:
             opponent = strategy(**init_kwargs)
-            opponent_type = type(opponent).name
+            opponent_strategy_name = type(opponent).name
             try:
                 player_seed = init_kwargs['seed']
             except KeyError:
-                pass
+                player_seed = None
 
         # Row Data Cols:
-        # 0:Generation no.
-        # 1:Mean score over pop
-        # 2:Medan score over pop
+        # 0:Generation number
+        # 1:Population score mean
+        # 2:Population score median
         # 3:Population Variance
-        # 4:Score range
-        # 5:Highest scoring result
-        # 6:sequence of highest scoring result
-        # 7:Opponent type
+        # 4:Population Score range
+        # 5:Best result score (Highest score)
+        # 6:parameters of Best result
+        # 7:Opponent strategy name
         # 8:Seed (if applicable, else None)
 
         # Opponent Sequence can be reconstructed by playing a match against the exact seed params
-
-        row = [self.generation,  # 0
-               mean(scores),  # 1
-               median(scores),  # 2
-               pstdev(scores),  # 3
-               results[0][0] - results[len(results) - 1][0],  # 4
-               results[0][0],  # 5
-               repr(self.population[results[0][1]]),  # 6
-               opponent_type,  # 7
-               player_seed]  # 8
+        row = [self.generation,
+               mean(scores),
+               median(scores),
+               pstdev(scores),
+               results[0][0] - results[len(results) - 1][0],
+               results[0][0],
+               repr(self.population[results[0][1]]),
+               opponent_strategy_name,
+               player_seed]
 
         self.outputer.write_row(row)
 
-        # Report
+        # Report to log
         if self.print_output:
+            print(row)
             print()
-            print(row)  # prints best result
 
         # Next Population
         indices_to_keep = [p for (s, p) in results[0: self.bottleneck]]
@@ -163,6 +161,13 @@ class Population(object):
     def __next__(self):
         self.evolve()
 
-    def run(self, generations):
+    def run(self, generations, print_output=True):
+        self.print_output = print_output
+        if print_output:
+            print("Starting evolution for", generations, "generations")
+
         for _ in range(generations):
             next(self)
+
+        if print_output:
+            print("Done.")

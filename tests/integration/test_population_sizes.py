@@ -31,7 +31,7 @@ class TestPopulationSizes(unittest.TestCase):
         self.assertEqual(len(population.population), population_size)
 
         # After Run
-        population.run(generations=5)
+        population.run(generations=5, print_output=False)
         self.assertEqual(len(population.population), population_size)
 
         # close the temp file
@@ -62,7 +62,7 @@ class TestPopulationSizes(unittest.TestCase):
         self.assertEqual(len(population.population), population_size)
 
         # After Run
-        population.run(generations=5)
+        population.run(generations=5, print_output=False)
         self.assertEqual(len(population.population), population_size)
 
         # close the temp file
