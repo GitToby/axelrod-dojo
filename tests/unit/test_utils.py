@@ -9,7 +9,7 @@ import axelrod_dojo.utils as utils
 
 
 class TestOutputer(unittest.TestCase):
-    temporary_file = tempfile.NamedTemporaryFile(delete=False)
+    temporary_file = tempfile.NamedTemporaryFile()
     outputer = utils.Outputer(filename=temporary_file.name, mode='a')
 
     def test_init(self):

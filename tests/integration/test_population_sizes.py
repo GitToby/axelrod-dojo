@@ -9,7 +9,7 @@ class TestPopulationSizes(unittest.TestCase):
 
     def test_basic_pop_size(self):
         # Set up Tmp file
-        temp_file = tempfile.NamedTemporaryFile(delete=False)
+        temp_file = tempfile.NamedTemporaryFile()
         # we will set the objective to be
         cycler_objective = axl_dojo.prepare_objective(name="score", turns=10, repetitions=1)
         # Lets use an opponent_list of just one:
@@ -31,7 +31,7 @@ class TestPopulationSizes(unittest.TestCase):
         self.assertEqual(len(population.population), population_size)
 
         # After Run
-        population.run(generations=5)
+        population.run(generations=5, print_output=False)
         self.assertEqual(len(population.population), population_size)
 
         # close the temp file
@@ -39,7 +39,7 @@ class TestPopulationSizes(unittest.TestCase):
 
     def test_bottleneck_pop_size(self):
         # Set up Tmp file
-        temp_file = tempfile.NamedTemporaryFile(delete=False)
+        temp_file = tempfile.NamedTemporaryFile()
         # we will set the objective to be
         cycler_objective = axl_dojo.prepare_objective(name="score", turns=10, repetitions=1)
         # Lets use an opponent_list of just one:
@@ -62,7 +62,7 @@ class TestPopulationSizes(unittest.TestCase):
         self.assertEqual(len(population.population), population_size)
 
         # After Run
-        population.run(generations=5)
+        population.run(generations=5, print_output=False)
         self.assertEqual(len(population.population), population_size)
 
         # close the temp file

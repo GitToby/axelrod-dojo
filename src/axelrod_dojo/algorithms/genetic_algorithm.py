@@ -14,10 +14,10 @@ class Population(object):
     def __init__(self, params_class, params_kwargs, size, objective, output_filename,
                  bottleneck=None, mutation_probability=.1, opponents=None,
                  processes=1, weights=None,
-                 sample_count=None, population=None, print_output=True):
+                 sample_count=None, population=None):
+        self.print_output = True
         self.params_class = params_class
         self.bottleneck = bottleneck
-        self.print_output = print_output
         if processes == 0:
             self.processes = cpu_count()
         else:
@@ -131,6 +131,9 @@ class Population(object):
     def __next__(self):
         self.evolve()
 
-    def run(self, generations):
+    def run(self, generations, print_output=True):
+        self.print_output = print_output
+
         for _ in range(generations):
             next(self)
+
